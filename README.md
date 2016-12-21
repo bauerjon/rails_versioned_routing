@@ -223,3 +223,60 @@ end
 Alternatively, you could move all the files for `friends` from the `v1`
 directory to the `v2` directory and avoid having to provide a `controller`
 option.
+
+### Deprecated/Removed﻿⁠⁠⁠⁠ Routes
+
+There are probably cases that older versions of your api contain routes that you do not want exposed in your new version. You can use the `deprecate` and `remove` functionality to get this behavior.
+
+#### Deprecating Routes
+
+Wrapping routes in a `deprecated` block will return a deprecated header along with you response.
+
+```ruby
+version(2) do
+  ...
+
+  deprecated do
+    resources :photos, only: [:show]
+  end
+end
+
+version(1) do
+  ...
+
+  resources :photos, only: [:show]
+end
+```
+
+In the above example, the photos show route is still accessible in v2, but it will return a deprecated header to notify the client that it is going away in a newer version.
+
+#### Removing Routes
+
+Wrapping routes in a `removed` block will reroute to your applications 404 route when that route is accessed.
+
+```ruby
+version(3) do
+  ...
+
+  removed do
+    resources :photos, only: [:show]
+  end
+end
+
+version(2) do
+  ...
+
+  deprecated do
+    resources :photos, only: [:show]
+  end
+end
+
+version(1) do
+  ...
+
+  resources :photos, only: [:show]
+end
+```
+
+In the above example, the photos show route is still accessible in v2, but will return a 404 when accessed in v3.
+
