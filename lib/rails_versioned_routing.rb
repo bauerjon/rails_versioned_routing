@@ -196,6 +196,20 @@ module RailsVersionedRouting
     scope(module: "v#{version_number}", constraints: api_constraint, &routes)
   end
 
+  def removed
+    @real_match = method(:match)
+
+    def match(*args)
+      @real_match.call(args[0], :to => "exceptions#render_404", via: :all)
+    end
+
+    yield
+
+    def match(*args)
+      @real_match.call(*args)
+    end
+  end
+
   def self.group_by_version
     VersionedGroup.new(Rails.application.routes.routes).grouped_by_version
   end
